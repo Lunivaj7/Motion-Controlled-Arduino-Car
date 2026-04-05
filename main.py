@@ -38,7 +38,7 @@ frame_count = 0
 process_frames = 2
 process_data_frames = 10
 
-def get_hand_arr(handLms, img):
+def get_hand_arr(handLms, img, handType):
     h, w, c = img.shape
     lm = []
     for i in range(21):
@@ -50,12 +50,20 @@ def get_hand_arr(handLms, img):
     #[thumb, index, middle, ring, pinky]
     hand = [0, 0, 0, 0, 0]
 
-    #thumb
-    if lm[4][0] < lm[3][0]-20:
-        hand[0]=1
-    else:
-        hand[0]=0
-    
+
+    if (handType=="Right"):
+        #Right Thumb
+        if lm[4][0] < lm[3][0]-20:
+            hand[0]=1
+        else:
+            hand[0]=0
+
+    else:#Left Thumb
+        if lm[4][0] > lm[3][0]+20:
+            hand[0]=1
+        else:
+            hand[0]=0
+
     #other fingers
     for i, tip in enumerate(fingerTips_ID[1:]):
 
@@ -63,7 +71,7 @@ def get_hand_arr(handLms, img):
             hand[i+1] = 1
         else:
             hand[i+1] = 0
-    
+
     return hand
 
 def send(message):
@@ -96,36 +104,37 @@ while True:
     if frame_count % process_frames == 0:
 
         results = hands.process(imgRGB)
-
         #hand calculations
         if results.multi_hand_landmarks:
-            for handLms in results.multi_hand_landmarks:
+            for handLms, handLabel in zip(results.multi_hand_landmarks, results.multi_handedness):
                 mpDraw.draw_landmarks(
                     img, 
                     handLms, 
                     mpHands.HAND_CONNECTIONS,
                     landmark_style,
                     connection_style
-                )
+                    )
 
                 #get hand array
-            if (frame_count%process_data_frames==0):
-                hand = get_hand_arr(handLms, img)    
-                print("Hand Array", hand)
+                if (frame_count%process_data_frames==0):
+                    
+                    hand_type = handLabel.classification[0].label
+                    hand = get_hand_arr(handLms, img, hand_type)    
+                    print("Hand Array", hand)
 
-                if hand==[1,1,1,1,1]:
-                    send("FWD")
+                    if hand==[1,1,1,1,1] or hand == [0,1,1,1,1]:
+                        send("FWD")
 
-                elif hand==[1,0,0,0,0]:
-                    send("REV")
+                    elif hand==[1,0,0,0,0]:
+                        send("REV")
             
-                elif hand==[0,1,0,0,0]:
-                    send("LEFT")
+                    elif (hand==[0,1,0,0,0] and hand_type=="Right") or (hand==[0,0,0,0,1] and hand_type=="Left"):
+                        send("LEFT")
             
-                elif hand==[0,0,0,0,1]:
-                    send("RIGHT")
-                else:
-                    send("STOP")
+                    elif (hand==[0,0,0,0,1] and hand_type=="Right") or (hand==[0,1,0,0,0] and hand_type=="Left"):
+                        send("RIGHT")
+                    else:
+                        send("STOP")
             
         #renders camera
         cv2.imshow("Hand Control", img)
@@ -133,6 +142,6 @@ while True:
             break
 
 #close connections
-arduino.close()
+#arduino.close()
 cap.release()
 cv2.destroyAllWindows()
