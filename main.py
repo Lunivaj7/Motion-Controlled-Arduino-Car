@@ -3,13 +3,14 @@ import mediapipe as mp
 import time
 from subprocess import call
 import numpy as np
-from arduino_manager import ArduinoManager
+import serial
 
 #Python: Select Interperter: Python_Project\venv\Scripts\python.exe
 
-# 1. Initialize Arduino
-arduino = ArduinoManager()
-arduino.connect()
+# connect to HC-05 module
+#arduino = serial.Serial('COM5',9600,timeout=0)
+#time.sleep(2)
+
 
 # MediaPipe Setup
 mpHands = mp.solutions.hands
@@ -50,7 +51,7 @@ def get_hand_arr(handLms, img):
     hand = [0, 0, 0, 0, 0]
 
     #thumb
-    if lm[4][0] < lm[3][0]:
+    if lm[4][0] < lm[3][0]-20:
         hand[0]=1
     else:
         hand[0]=0
@@ -64,7 +65,11 @@ def get_hand_arr(handLms, img):
             hand[i+1] = 0
     
     return hand
-        
+
+def send(message):
+    #arduino.write((message + "\n").encode())
+    print(message)
+
 #Video Loop
 while True:
     success, img = cap.read()
@@ -109,16 +114,18 @@ while True:
                 print("Hand Array", hand)
 
                 if hand==[1,1,1,1,1]:
-                    arduino.send("FWD")
+                    send("FWD")
 
                 elif hand==[1,0,0,0,0]:
-                    arduino.send("REV")
+                    send("REV")
             
                 elif hand==[0,1,0,0,0]:
-                    arduino.send("LEFT")
+                    send("LEFT")
             
                 elif hand==[0,0,0,0,1]:
-                    arduino.send("RIGHT")
+                    send("RIGHT")
+                else:
+                    send("STOP")
             
         #renders camera
         cv2.imshow("Hand Control", img)
