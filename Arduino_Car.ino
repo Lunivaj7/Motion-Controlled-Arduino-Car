@@ -78,6 +78,30 @@ void loop() {
       motor3.run(BACKWARD);
       motor4.run(BACKWARD);
     }
+    else if (msg == "BACKLEFT"){
+      motor1.run(RELEASE);
+      motor2.run(BACKWARD);
+      motor3.run(BACKWARD);
+      motor4.run(RELEASE);
+    }
+    else if (msg == "BACKRIGHT"){
+      motor1.run(BACKWARD);
+      motor2.run(RELEASE);
+      motor3.run(RELEASE);
+      motor4.run(BACKWARD);
+    }
+    else if (msg == "MYSTERY1"){
+      motor1.run(BACKWARD);
+      motor2.run(FORWARD);
+      motor3.run(FORWARD);
+      motor4.run(BACKWARD);
+    }
+    else if (msg == "MYSTERY2"){
+      motor1.run(FORWARD);
+      motor2.run(BACKWARD);
+      motor3.run(BACKWARD);
+      motor4.run(FORWARD);
+    }
     else{
       motor1.run(RELEASE);
       motor2.run(RELEASE);
