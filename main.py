@@ -132,6 +132,14 @@ while True:
             
                     elif (hand==[0,0,0,0,1] and hand_type=="Right") or (hand==[0,1,0,0,0] and hand_type=="Left"):
                         send("RIGHT")
+                    elif (hand==[1,1,0,0,0] and hand_type=="Right") or (hand==[1,0,0,0,1] and hand_type=="Left"):
+                        send("BACKLEFT")
+                    elif(hand==[1,0,0,0,1] and hand_type=="Right") or (hand==[1,1,0,0,0] and hand_type=="Left"):
+                        send("BACKRIGHT")
+                    elif(hand==[0,0,1,0,0] and hand_type=="Right") or (hand==[1,0,1,0,0] and hand_type=="Right"):
+                        send("MYSTERY1")
+                    elif(hand==[0,0,1,0,0] and hand_type=="Left") or (hand==[1,0,1,0,0] and hand_type=="Left"):
+                        send("MYSTERY2")
                     else:
                         send("STOP")
         else:
