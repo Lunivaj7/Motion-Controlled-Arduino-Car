@@ -4,21 +4,23 @@ import time
 from subprocess import call
 import numpy as np
 import serial
+#Use venv: Control + Shift + P: Select Interperter: Python_Project\venv\Scripts\python.exe
 
-#Python: Select Interperter: Python_Project\venv\Scripts\python.exe
+#connect to HC-05 module
+#pair by bluetooth to laptop first. Password for HC-05 Module is: 1234
+#IMPORTANT: CHANGE COM PORT DEPENDING ON WHAT THE BLUETOOTH MODULE IS CONNECTED WITH
 
-# connect to HC-05 module
-#arduino = serial.Serial('COM5',9600,timeout=0)
-#time.sleep(2)
+arduino = serial.Serial('COM3',9600,timeout=0)
+time.sleep(2)
 
 
 # MediaPipe Setup
 mpHands = mp.solutions.hands
-hands = hands = mpHands.Hands(
+hands = mpHands.Hands(
     max_num_hands=1,
     model_complexity=1,
-    min_detection_confidence=0.8,
-    min_tracking_confidence=0.8
+    min_detection_confidence=0.7,
+    min_tracking_confidence=0.7
 )
 mpDraw = mp.solutions.drawing_utils
 landmark_style = mpDraw.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=3)
@@ -26,7 +28,6 @@ connection_style = mpDraw.DrawingSpec(color=(0, 255, 0), thickness=2)
 
 
 fingerTips_ID = [4,8,12,16,20] #[thumb, index, middle, ring, pinky]
-
 
 #video capture
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -75,7 +76,7 @@ def get_hand_arr(handLms, img, handType):
     return hand
 
 def send(message):
-    #arduino.write((message + "\n").encode())
+    arduino.write((message + "\n").encode())
     print(message)
 
 #Video Loop
@@ -133,8 +134,16 @@ while True:
             
                     elif (hand==[0,0,0,0,1] and hand_type=="Right") or (hand==[0,1,0,0,0] and hand_type=="Left"):
                         send("RIGHT")
+                    elif (hand==[1,1,0,0,0] and hand_type=="Right") or (hand==[1,0,0,0,1] and hand_type=="Left"):
+                        send("BACKLEFT")
+                    elif(hand==[1,0,0,0,1] and hand_type=="Right") or (hand==[1,1,0,0,0] and hand_type=="Left"):
+                        send("BACKRIGHT")
                     else:
                         send("STOP")
+        else:
+            if frame_count % process_data_frames == 0:
+                send("STOP")
+
             
         #renders camera
         cv2.imshow("Hand Control", img)
@@ -142,6 +151,6 @@ while True:
             break
 
 #close connections
-#arduino.close()
+arduino.close()
 cap.release()
 cv2.destroyAllWindows()
