@@ -7,8 +7,9 @@ AF_DCMotor motor2(2);
 AF_DCMotor motor3(3); 
 AF_DCMotor motor4(4);
 
-// RX on A0, TX on A1
+// RX on 2, RX on A1
 SoftwareSerial BT(2, A1); 
+//RX = Purple Wire, TX = Orange Wire
 double distance = 100;
 long duration = 0;
 
@@ -36,12 +37,20 @@ void loop() {
     Serial.println(msg);
     
     if (msg == "LEFT") {
+      motor1.setSpeed(100);
+      motor2.setSpeed(100);
+      motor3.setSpeed(100);
+      motor4.setSpeed(100);
       motor2.run(FORWARD);
       motor3.run(FORWARD);
       motor1.run(RELEASE);
       motor4.run(RELEASE);
     } 
     else if(msg == "RIGHT"){
+      motor1.setSpeed(100);
+      motor2.setSpeed(100);
+      motor3.setSpeed(100);
+      motor4.setSpeed(100);
       motor1.run(FORWARD);
       motor4.run(FORWARD);
       motor2.run(RELEASE);
@@ -59,8 +68,11 @@ void loop() {
       
       Serial.print("Distance: ");
       Serial.println(distance);
-
-      if (distance > 8) {
+      motor1.setSpeed(200);
+      motor2.setSpeed(200);
+      motor3.setSpeed(200);
+      motor4.setSpeed(200);
+      if (distance > 20) {
         motor1.run(FORWARD);
         motor2.run(FORWARD);
         motor3.run(FORWARD);
@@ -73,30 +85,50 @@ void loop() {
       }
     }
     else if (msg == "REV"){
+      motor1.setSpeed(200);
+      motor2.setSpeed(200);
+      motor3.setSpeed(200);
+      motor4.setSpeed(200);
       motor1.run(BACKWARD);
       motor2.run(BACKWARD);
       motor3.run(BACKWARD);
       motor4.run(BACKWARD);
     }
     else if (msg == "BACKLEFT"){
+      motor1.setSpeed(100);
+      motor2.setSpeed(100);
+      motor3.setSpeed(100);
+      motor4.setSpeed(100);
       motor1.run(RELEASE);
       motor2.run(BACKWARD);
       motor3.run(BACKWARD);
       motor4.run(RELEASE);
     }
     else if (msg == "BACKRIGHT"){
+      motor1.setSpeed(100);
+      motor2.setSpeed(100);
+      motor3.setSpeed(100);
+      motor4.setSpeed(100);
       motor1.run(BACKWARD);
       motor2.run(RELEASE);
       motor3.run(RELEASE);
       motor4.run(BACKWARD);
     }
     else if (msg == "MYSTERY1"){
+      motor1.setSpeed(200);
+      motor2.setSpeed(200);
+      motor3.setSpeed(200);
+      motor4.setSpeed(200);
       motor1.run(BACKWARD);
       motor2.run(FORWARD);
       motor3.run(FORWARD);
       motor4.run(BACKWARD);
     }
     else if (msg == "MYSTERY2"){
+      motor1.setSpeed(200);
+      motor2.setSpeed(200);
+      motor3.setSpeed(200);
+      motor4.setSpeed(200);
       motor1.run(FORWARD);
       motor2.run(BACKWARD);
       motor3.run(BACKWARD);
